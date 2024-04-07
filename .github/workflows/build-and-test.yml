@@ -1,0 +1,40 @@
+name: Build and test PR
+
+on:
+  push:
+    branches: [ "master" ]
+    paths: [ ".github/workflows/build-and-test.yml", "sababagram/**", "tests/**", "pyproject.toml" ]
+  pull_request:
+    branches: [ "master" ]
+    paths: [ ".github/workflows/build-and-test.yml", "sababagram/**", "tests/**", "pyproject.toml" ]
+
+jobs:
+  build-and-test:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: "pip"
+        cache-dependency-path: "pyproject.toml"
+    - name: Install dependencies
+      run: |
+        pip install -e .[test]
+    - name: Lint code
+      run: |
+        ruff --output-format=github sababagram examples
+        mypy sababagram
+        black --check --diff sababgram tests
+    - name: Test with pytest
+      run: |
+        pytest
