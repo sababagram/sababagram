@@ -1,0 +1,2 @@
+class BaseTelegramType:
+    pass
