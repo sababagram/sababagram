@@ -43,3 +43,6 @@ issues = "https://github.com/sababagram/sababagram/issues"
 
 [tool.setuptools]
 packages = ["sababagram"]
+
+[tool.ruff]
+line-length = 100
